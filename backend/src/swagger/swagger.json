@@ -1,0 +1,404 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Service Booking & Management API",
+    "version": "1.0.0",
+    "description": "Production-grade RESTful API backend supporting Flutter Service Booking & Management Mobile App. Features JWT Auth, Services Catalog, Conflict-proof Appointments Booking, and AI Assistant powered by Google Gemini."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "http://10.0.2.2:5000/api",
+      "description": "Android Emulator Access"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter JWT token obtained from /auth/login or /auth/register"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "avatar": { "type": "string" },
+          "role": { "type": "string", "enum": ["user", "admin"] },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "price": { "type": "number" },
+          "duration": { "type": "integer", "description": "Duration in minutes" },
+          "image": { "type": "string" },
+          "category": { "type": "string" },
+          "rating": { "type": "number" },
+          "reviewCount": { "type": "integer" },
+          "isFeatured": { "type": "boolean" },
+          "isAvailable": { "type": "boolean" }
+        }
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/User" },
+          "service": { "$ref": "#/components/schemas/Service" },
+          "date": { "type": "string", "example": "2026-11-20" },
+          "timeSlot": { "type": "string", "example": "10:00 AM - 11:00 AM" },
+          "status": { "type": "string", "enum": ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"] },
+          "notes": { "type": "string" },
+          "totalAmount": { "type": "number" },
+          "createdAt": { "type": "string" }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data": { "type": "object" },
+          "meta": { "type": "object" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check and service status",
+        "tags": ["System"],
+        "responses": {
+          "200": { "description": "API status details" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user account",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string", "example": "Sarah Connor" },
+                  "email": { "type": "string", "example": "sarah@example.com" },
+                  "password": { "type": "string", "example": "Password123!" },
+                  "phone": { "type": "string", "example": "+1 555-0123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created with JWT token" },
+          "400": { "description": "Validation error" },
+          "409": { "description": "Email already in use" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate user & receive JWT token",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "john.doe@example.com" },
+                  "password": { "type": "string", "example": "Password123!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful, returns token" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get authenticated user info",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Authenticated user profile" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "put": {
+        "summary": "Change current user password",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["currentPassword", "newPassword"],
+                "properties": {
+                  "currentPassword": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 6 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password updated successfully" },
+          "400": { "description": "Incorrect current password" }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "summary": "Retrieve authenticated user profile",
+        "tags": ["User Profile"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User profile data" }
+        }
+      },
+      "put": {
+        "summary": "Update authenticated user profile information",
+        "tags": ["User Profile"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "avatar": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "summary": "Search & filter services with pagination",
+        "tags": ["Services"],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" }, "description": "Keyword search across name and description" },
+          { "name": "category", "in": "query", "schema": { "type": "string" }, "description": "Filter by category name" },
+          { "name": "featured", "in": "query", "schema": { "type": "string", "enum": ["true", "false"] } },
+          { "name": "minPrice", "in": "query", "schema": { "type": "number" } },
+          { "name": "maxPrice", "in": "query", "schema": { "type": "number" } },
+          { "name": "sortBy", "in": "query", "schema": { "type": "string", "enum": ["price", "duration", "rating", "name"] } },
+          { "name": "order", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "List of services with pagination metadata" }
+        }
+      }
+    },
+    "/services/featured": {
+      "get": {
+        "summary": "Get featured services for Home Screen",
+        "tags": ["Services"],
+        "responses": {
+          "200": { "description": "List of featured services" }
+        }
+      }
+    },
+    "/services/categories": {
+      "get": {
+        "summary": "Get all service categories with counts",
+        "tags": ["Services"],
+        "responses": {
+          "200": { "description": "List of categories" }
+        }
+      }
+    },
+    "/services/{id}": {
+      "get": {
+        "summary": "Get individual service details",
+        "tags": ["Services"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Service details" },
+          "404": { "description": "Service not found" }
+        }
+      }
+    },
+    "/appointments": {
+      "post": {
+        "summary": "Create new appointment booking (with conflict prevention)",
+        "tags": ["Appointments"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["serviceId", "date", "timeSlot"],
+                "properties": {
+                  "serviceId": { "type": "string", "example": "65b...c" },
+                  "date": { "type": "string", "example": "2026-11-20" },
+                  "timeSlot": { "type": "string", "example": "10:00 AM - 11:00 AM" },
+                  "notes": { "type": "string", "example": "Optional notes or preferences" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Appointment created" },
+          "409": { "description": "Time slot already booked (Conflict)" }
+        }
+      },
+      "get": {
+        "summary": "Get user appointments (Upcoming and Previous)",
+        "tags": ["Appointments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "filter", "in": "query", "schema": { "type": "string", "enum": ["upcoming", "previous", "all"] } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"] } }
+        ],
+        "responses": {
+          "200": { "description": "User appointments list" }
+        }
+      }
+    },
+    "/appointments/available-slots": {
+      "get": {
+        "summary": "Check availability of time slots for a service on a given date",
+        "tags": ["Appointments"],
+        "parameters": [
+          { "name": "serviceId", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "date", "in": "query", "required": true, "schema": { "type": "string", "example": "2026-11-20" } }
+        ],
+        "responses": {
+          "200": { "description": "Slots list with isAvailable boolean flag" }
+        }
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "summary": "Get individual appointment details",
+        "tags": ["Appointments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Appointment details" }
+        }
+      }
+    },
+    "/appointments/{id}/cancel": {
+      "patch": {
+        "summary": "Cancel a pending or confirmed appointment",
+        "tags": ["Appointments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Appointment marked CANCELLED" },
+          "400": { "description": "Appointment already cancelled or completed" }
+        }
+      }
+    },
+    "/ai/chat": {
+      "post": {
+        "summary": "Chat with AI Service Assistant (Grounded in database services)",
+        "tags": ["AI Assistant"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": { "type": "string", "example": "What massage services do you have under $80?" },
+                  "history": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "role": { "type": "string", "enum": ["user", "assistant"] },
+                        "content": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "AI reply with suggestedServices array" }
+        }
+      }
+    },
+    "/ai/recommend": {
+      "post": {
+        "summary": "Get AI service recommendations based on user preferences",
+        "tags": ["AI Assistant"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["preferences"],
+                "properties": {
+                  "preferences": { "type": "string", "example": "I need to relax after a stressful week" },
+                  "category": { "type": "string", "example": "Spa & Massage" },
+                  "maxBudget": { "type": "number", "example": 100 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Curated recommendations and services list" }
+        }
+      }
+    }
+  }
+}
