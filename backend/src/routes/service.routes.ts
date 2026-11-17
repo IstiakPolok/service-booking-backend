@@ -23,3 +23,4 @@ router.put('/:id', authenticate, requireAdmin, validate(updateServiceSchema), Se
 router.delete('/:id', authenticate, requireAdmin, validate(serviceIdParamSchema), ServiceController.deleteService);
 
 export default router;
+

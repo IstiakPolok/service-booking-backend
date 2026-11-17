@@ -89,3 +89,4 @@ const ServiceSchema = new Schema<IService>(
 ServiceSchema.index({ name: 'text', description: 'text', category: 'text' });
 
 export const Service: Model<IService> = mongoose.model<IService>('Service', ServiceSchema);
+

@@ -13,3 +13,4 @@ router.get('/profile', UserController.getProfile);
 router.put('/profile', validate(updateProfileSchema), UserController.updateProfile);
 
 export default router;
+

@@ -217,3 +217,4 @@ const runStandaloneSeed = async () => {
 if (process.argv[1]?.includes('seed')) {
   runStandaloneSeed();
 }
+

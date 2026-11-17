@@ -72,3 +72,4 @@ export class AuthController {
     return ApiResponse.success(res, 'Logged out successfully');
   });
 }
+

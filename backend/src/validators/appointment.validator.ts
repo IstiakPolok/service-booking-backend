@@ -41,3 +41,4 @@ export const availableSlotsQuerySchema = z.object({
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in format YYYY-MM-DD'),
   }),
 });
+

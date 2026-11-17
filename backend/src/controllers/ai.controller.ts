@@ -26,3 +26,4 @@ export class AiController {
     return ApiResponse.success(res, 'AI recommendations generated', response);
   });
 }
+

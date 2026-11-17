@@ -33,3 +33,4 @@ apiRouter.use('/appointments', appointmentRoutes);
 apiRouter.use('/ai', aiRoutes);
 
 export default apiRouter;
+

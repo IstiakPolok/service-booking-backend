@@ -132,3 +132,4 @@ To satisfy **Assessment Section 3.C ("Validate appointment availability and prev
 2. When checking slots via `GET /api/appointments/available-slots?serviceId=...&date=...`:
    - Checks all standard slots against booked non-cancelled records.
    - Marks booked slots with `isAvailable: false`, enabling the Flutter app to disable booked time slot chips in the UI!
+

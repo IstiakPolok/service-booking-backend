@@ -77,3 +77,4 @@ export const Appointment: Model<IAppointment> = mongoose.model<IAppointment>(
   'Appointment',
   AppointmentSchema
 );
+

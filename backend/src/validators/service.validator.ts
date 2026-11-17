@@ -52,3 +52,4 @@ export const updateServiceSchema = z.object({
     isAvailable: z.boolean().optional(),
   }),
 });
+

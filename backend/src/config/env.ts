@@ -14,3 +14,4 @@ export const ENV = {
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
   IS_PRODUCTION: process.env.NODE_ENV === 'production',
 };
+

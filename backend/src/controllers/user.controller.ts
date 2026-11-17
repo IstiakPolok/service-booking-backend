@@ -34,3 +34,4 @@ export class UserController {
     return ApiResponse.success(res, 'User profile updated successfully', updatedUser);
   });
 }
+

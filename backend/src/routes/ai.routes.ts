@@ -10,3 +10,4 @@ router.post('/chat', validate(aiChatSchema), AiController.chat);
 router.post('/recommend', validate(aiRecommendSchema), AiController.recommend);
 
 export default router;
+

@@ -21,3 +21,4 @@ router.get('/me', authenticate, AuthController.getMe);
 router.put('/change-password', authenticate, validate(changePasswordSchema), AuthController.changePassword);
 
 export default router;
+

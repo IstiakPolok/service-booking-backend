@@ -23,3 +23,4 @@ router.get('/:id', validate(appointmentIdParamSchema), AppointmentController.get
 router.patch('/:id/cancel', validate(appointmentIdParamSchema), AppointmentController.cancelAppointment);
 
 export default router;
+

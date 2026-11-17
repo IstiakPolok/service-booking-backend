@@ -99,3 +99,4 @@ export class AppointmentController {
     return ApiResponse.success(res, 'Appointment cancelled successfully', appointment);
   });
 }
+

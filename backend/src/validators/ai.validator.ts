@@ -28,3 +28,4 @@ export const aiRecommendSchema = z.object({
     maxBudget: z.number().min(0).optional(),
   }),
 });
+

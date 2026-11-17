@@ -58,3 +58,4 @@ export const changePasswordSchema = z.object({
       .max(100, 'New password must be at most 100 characters'),
   }),
 });
+

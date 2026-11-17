@@ -34,3 +34,4 @@ export const STANDARD_TIME_SLOTS = [
 ] as const;
 
 export type TimeSlot = (typeof STANDARD_TIME_SLOTS)[number];
+

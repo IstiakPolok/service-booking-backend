@@ -229,3 +229,4 @@ The AI Service Assistant feature fulfills **Section 4 of the Technical Assessmen
 | `POST` | `/api/ai/recommend` | Get AI curated recommendations | Public/Protected |
 
 For full request/response schemas, view [API_DOCUMENTATION.md](./docs/API_DOCUMENTATION.md) or open `http://localhost:5000/api/docs`.
+
