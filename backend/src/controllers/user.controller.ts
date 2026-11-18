@@ -33,5 +33,33 @@ export class UserController {
 
     return ApiResponse.success(res, 'User profile updated successfully', updatedUser);
   });
+
+  /**
+   * Upload user avatar
+   * POST /api/users/avatar
+   */
+  static uploadAvatar = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw ApiError.unauthorized();
+    }
+
+    if (!req.file) {
+      throw new ApiError(400, 'Please select an image file to upload.');
+    }
+
+    // Generate absolute or relative URL
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const avatarUrl = `${protocol}://${host}/uploads/avatars/${req.file.filename}`;
+
+    const updatedUser = await AuthService.updateProfile(req.user.id, {
+      avatar: avatarUrl,
+    });
+
+    return ApiResponse.success(res, 'Avatar uploaded and profile updated successfully', {
+      avatar: avatarUrl,
+      user: updatedUser,
+    });
+  });
 }
 

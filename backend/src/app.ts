@@ -76,6 +76,9 @@ export const createApp = (): Application => {
     console.warn('Swagger documentation could not be loaded:', err.message);
   }
 
+  // Static Assets - Uploaded Profile Images
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
   // Welcome Route
   app.get('/', (req: Request, res: Response) => {
     res.json({

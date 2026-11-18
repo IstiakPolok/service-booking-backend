@@ -10,7 +10,15 @@ export class AuthController {
    * POST /api/auth/register
    */
   static register = asyncHandler(async (req: Request, res: Response) => {
-    const { name, email, password, phone, avatar } = req.body;
+    let { name, email, password, phone, avatar } = req.body;
+
+    // If an avatar file was uploaded via multipart/form-data
+    if (req.file) {
+      const protocol = req.protocol;
+      const host = req.get('host');
+      avatar = `${protocol}://${host}/uploads/avatars/${req.file.filename}`;
+    }
+
     const { user, token } = await AuthService.register({
       name,
       email,
