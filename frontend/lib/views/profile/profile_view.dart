@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/storage/token_storage.dart';
+import '../../providers/ai_chat_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_view.dart';
 import 'change_password_dialog.dart';
@@ -72,24 +73,33 @@ class ProfileView extends StatelessWidget {
   void _handleLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('Sign Out'),
           content: const Text('Are you sure you want to sign out of your account?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context);
+                // 1. Close confirmation dialog
+                Navigator.pop(dialogContext);
+
+                // 2. Perform logout (clears token, cached user, and auth state)
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
                 await authProvider.logout();
+
+                // 3. Clear AI chat session for security
                 if (context.mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
+                  Provider.of<AiChatProvider>(context, listen: false).clearChat();
+                }
+
+                // 4. Navigate cleanly to Login screen, removing all previous routes
+                if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const LoginView()),
                     (route) => false,
                   );
