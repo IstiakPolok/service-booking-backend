@@ -13,8 +13,8 @@ const startServer = async () => {
     const app = createApp();
     const server = http.createServer(app);
 
-    // 3. Start listening on configured port
-    server.listen(ENV.PORT, () => {
+    // 3. Start listening on configured port (bind to 0.0.0.0 to allow LAN & physical devices)
+    server.listen(ENV.PORT, '0.0.0.0', () => {
       logger.success(`🚀 Server running in ${ENV.NODE_ENV} mode on port ${ENV.PORT}`);
       logger.info(`📖 Swagger UI Documentation: http://localhost:${ENV.PORT}/api/docs`);
       logger.info(`🔍 Health Check: http://localhost:${ENV.PORT}/api/health`);
