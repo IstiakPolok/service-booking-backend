@@ -21,11 +21,16 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (_req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-  if (allowedMimes.includes(file.mimetype)) {
+  const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  const isMimeValid = file.mimetype.startsWith('image/');
+  const isExtValid = allowedExtensions.includes(ext);
+
+  if (isMimeValid || isExtValid || file.mimetype === 'application/octet-stream') {
     cb(null, true);
   } else {
-    cb(new ApiError(400, 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.'));
+    cb(new ApiError(400, 'Invalid file type. Only image files (JPEG, PNG, WebP, HEIC) are allowed.'));
   }
 };
 
