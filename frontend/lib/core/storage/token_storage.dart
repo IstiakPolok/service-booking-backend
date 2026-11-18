@@ -15,7 +15,15 @@ class TokenStorage {
     // Load persisted base URL if custom
     final savedBaseUrl = _prefs?.getString(_keyBaseUrl);
     if (savedBaseUrl != null && savedBaseUrl.isNotEmpty) {
-      ApiEndpoints.baseUrl = savedBaseUrl;
+      if (savedBaseUrl.contains('10.0.2.2') || savedBaseUrl.contains('127.0.0.1')) {
+        // Upgrade old local emulator URL to the live cloud URL
+        await _prefs?.remove(_keyBaseUrl);
+        ApiEndpoints.baseUrl = ApiEndpoints.defaultBaseUrl;
+      } else {
+        ApiEndpoints.baseUrl = savedBaseUrl;
+      }
+    } else {
+      ApiEndpoints.baseUrl = ApiEndpoints.defaultBaseUrl;
     }
   }
 

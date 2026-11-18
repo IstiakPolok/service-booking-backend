@@ -61,6 +61,10 @@ class _LoginViewState extends State<LoginView> {
                 runSpacing: 6,
                 children: [
                   ActionChip(
+                    label: const Text('☁️ Live Cloud (Render)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                    onPressed: () => controller.text = ApiEndpoints.urlRender,
+                  ),
+                  ActionChip(
                     label: const Text('Wi-Fi (192.168.0.102)', style: TextStyle(fontSize: 11)),
                     onPressed: () => controller.text = ApiEndpoints.urlWifi,
                   ),

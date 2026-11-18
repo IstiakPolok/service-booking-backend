@@ -1,22 +1,18 @@
-import 'package:flutter/foundation.dart';
-
 class ApiEndpoints {
-  // Your computer's current Wi-Fi LAN IP (detected from network)
+  // Live Cloud Production URL (Render)
+  static const String liveCloudUrl = 'https://service-booking-backend-82zz.onrender.com/api';
+
+  // Local PC Wi-Fi IP
   static const String pcWifiIp = '192.168.0.102';
 
-  // Default host determination
-  static String get defaultBaseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:5000/api';
-    }
-    // On physical Android devices over Wi-Fi, point directly to your computer's IP
-    return 'http://$pcWifiIp:5000/api';
-  }
+  // Default host determination - points directly to the live Render backend!
+  static String get defaultBaseUrl => liveCloudUrl;
 
   // Active base URL (can be customized via in-app settings at runtime)
   static String baseUrl = defaultBaseUrl;
 
-  // Preset quick endpoints for easy switching
+  // Preset quick endpoints for easy switching in settings
+  static const String urlRender = liveCloudUrl;
   static const String urlWifi = 'http://$pcWifiIp:5000/api';
   static const String urlUsbAdb = 'http://localhost:5000/api';
   static const String urlEmulator = 'http://10.0.2.2:5000/api';
