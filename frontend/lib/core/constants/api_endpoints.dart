@@ -25,6 +25,7 @@ class ApiEndpoints {
 
   // User Routes
   static String get profile => '$baseUrl/users/profile';
+  static String get uploadAvatar => '$baseUrl/users/avatar';
 
   // Services Routes
   static String get services => '$baseUrl/services';

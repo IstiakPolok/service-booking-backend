@@ -10,17 +10,34 @@ class AuthService {
     required String email,
     required String password,
     String? phone,
+    String? avatarFilePath,
   }) async {
-    final response = await ApiClient.post(
-      ApiEndpoints.register,
-      requiresAuth: false,
-      body: {
-        'name': name,
-        'email': email,
-        'password': password,
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-      },
-    );
+    dynamic response;
+    if (avatarFilePath != null && avatarFilePath.isNotEmpty) {
+      response = await ApiClient.multipart(
+        ApiEndpoints.register,
+        filePath: avatarFilePath,
+        fieldName: 'avatar',
+        requiresAuth: false,
+        fields: {
+          'name': name,
+          'email': email,
+          'password': password,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+        },
+      );
+    } else {
+      response = await ApiClient.post(
+        ApiEndpoints.register,
+        requiresAuth: false,
+        body: {
+          'name': name,
+          'email': email,
+          'password': password,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+        },
+      );
+    }
 
     final data = response['data'];
     final token = data['token'] as String;
@@ -80,6 +97,21 @@ class AuthService {
     );
 
     final user = UserModel.fromJson(response['data']);
+    await TokenStorage.saveUser(user.toJson());
+    return user;
+  }
+
+  /// Upload user profile avatar photo
+  static Future<UserModel> uploadAvatar(String filePath) async {
+    final response = await ApiClient.multipart(
+      ApiEndpoints.uploadAvatar,
+      filePath: filePath,
+      fieldName: 'avatar',
+      requiresAuth: true,
+    );
+
+    final data = response['data'];
+    final user = UserModel.fromJson(data['user']);
     await TokenStorage.saveUser(user.toJson());
     return user;
   }

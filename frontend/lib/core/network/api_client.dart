@@ -135,4 +135,43 @@ class ApiClient {
       throw ApiException(e.toString());
     }
   }
+
+  /// Multipart POST (e.g. for image uploads)
+  static Future<dynamic> multipart(
+    String url, {
+    required String filePath,
+    required String fieldName,
+    Map<String, String>? fields,
+    bool requiresAuth = true,
+  }) async {
+    try {
+      final uri = Uri.parse(url);
+      final request = http.MultipartRequest('POST', uri);
+
+      if (requiresAuth) {
+        final token = await TokenStorage.getToken();
+        if (token != null && token.isNotEmpty) {
+          request.headers['Authorization'] = 'Bearer $token';
+        }
+      }
+      request.headers['Accept'] = 'application/json';
+
+      if (fields != null) {
+        request.fields.addAll(fields);
+      }
+
+      request.files.add(await http.MultipartFile.fromPath(fieldName, filePath));
+
+      final streamedResponse = await request.send().timeout(_timeoutDuration);
+      final response = await http.Response.fromStream(streamedResponse);
+      return _processResponse(response);
+    } on SocketException {
+      throw NetworkException();
+    } on TimeoutException {
+      throw NetworkException('Upload timed out. Please try again.');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw ApiException(e.toString());
+    }
+  }
 }

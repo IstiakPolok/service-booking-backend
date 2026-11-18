@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/validators.dart';
@@ -20,6 +22,8 @@ class _RegisterViewState extends State<RegisterView> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _selectedImagePath;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -28,6 +32,29 @@ class _RegisterViewState extends State<RegisterView> {
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? file = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 800,
+      );
+      if (file != null) {
+        setState(() {
+          _selectedImagePath = file.path;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not pick image: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _handleRegister() async {
@@ -39,6 +66,7 @@ class _RegisterViewState extends State<RegisterView> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
       phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
+      avatarFilePath: _selectedImagePath,
     );
 
     if (!mounted) return;
@@ -93,7 +121,60 @@ class _RegisterViewState extends State<RegisterView> {
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 20),
+
+                  // Avatar Picker
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 46,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          backgroundImage: _selectedImagePath != null
+                              ? FileImage(File(_selectedImagePath!))
+                              : null,
+                          child: _selectedImagePath == null
+                              ? const Icon(
+                                  Icons.person_rounded,
+                                  size: 46,
+                                  color: AppColors.primary,
+                                )
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      _selectedImagePath != null ? 'Tap icon to change photo' : 'Upload Profile Picture (Optional)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _selectedImagePath != null ? AppColors.primary : AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
                   CustomTextField(
                     label: 'Full Name',

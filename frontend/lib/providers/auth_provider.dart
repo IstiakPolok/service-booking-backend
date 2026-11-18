@@ -82,6 +82,7 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String password,
     String? phone,
+    String? avatarFilePath,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -93,9 +94,30 @@ class AuthProvider extends ChangeNotifier {
         email: email,
         password: password,
         phone: phone,
+        avatarFilePath: avatarFilePath,
       );
       _currentUser = user;
       _isAuthenticated = true;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Upload Avatar File
+  Future<bool> uploadAvatar(String filePath) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final updated = await AuthService.uploadAvatar(filePath);
+      _currentUser = updated;
       _isLoading = false;
       notifyListeners();
       return true;
