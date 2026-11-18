@@ -1,25 +1,25 @@
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 
 class ApiEndpoints {
+  // Your computer's current Wi-Fi LAN IP (detected from network)
+  static const String pcWifiIp = '192.168.0.102';
+
   // Default host determination
   static String get defaultBaseUrl {
     if (kIsWeb) {
       return 'http://localhost:5000/api';
     }
-    try {
-      if (Platform.isAndroid) {
-        // Android Emulator accesses host loopback via 10.0.2.2
-        return 'http://10.0.2.2:5000/api';
-      }
-    } catch (_) {
-      // In case platform is not supported or web
-    }
-    return 'http://localhost:5000/api';
+    // On physical Android devices over Wi-Fi, point directly to your computer's IP
+    return 'http://$pcWifiIp:5000/api';
   }
 
-  // Active base URL (can be customized via settings at runtime)
+  // Active base URL (can be customized via in-app settings at runtime)
   static String baseUrl = defaultBaseUrl;
+
+  // Preset quick endpoints for easy switching
+  static const String urlWifi = 'http://$pcWifiIp:5000/api';
+  static const String urlUsbAdb = 'http://localhost:5000/api';
+  static const String urlEmulator = 'http://10.0.2.2:5000/api';
 
   // Auth Routes
   static String get register => '$baseUrl/auth/register';
